@@ -12,6 +12,9 @@ import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.VideoView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity {
 
     MediaPlayer mediaPlayer;
@@ -44,10 +47,44 @@ public class MainActivity extends AppCompatActivity {
         int maxVolume = audioManager.getStreamMaxVolume(audioManager.STREAM_MUSIC);
         int cuvVolume = audioManager.getStreamMaxVolume(audioManager.STREAM_MUSIC);
 
+        volumeControl.setMax(maxVolume);
+        volumeControl.setProgress(cuvVolume);
+
         volumeControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Log.i("SeekBar value", Integer.toString(progress));
+
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,progress,0);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        final SeekBar seekBar2 = (SeekBar) findViewById(R.id.seekBar2);
+        seekBar2.setMax(mediaPlayer.getDuration());
+
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                seekBar2.setProgress(mediaPlayer.getCurrentPosition());
+            }
+        },0,100);
+
+        seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.i("SeekBar value", Integer.toString(progress));
+                mediaPlayer.seekTo(progress);
             }
 
             @Override
